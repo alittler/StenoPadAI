@@ -5,16 +5,22 @@ const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const DB_PATH = path.join(__dirname, 'data', 'notes.json');
+// This path is where Render will store your data file.
+const DB_PATH = path.join(process.env.RENDER_DISK_PATH || __dirname, 'data', 'notes.json');
 
 // Middleware
 app.use(cors()); // Allows your frontend to talk to this server
-app.use(express.json()); // Allows the server to understand JSON data
+app.use(express.json({limit: '10mb'})); // Allows the server to understand JSON data, with a generous size limit
 
 // Ensure the data directory and file exist
 fs.ensureFileSync(DB_PATH);
 
 // --- API Routes ---
+
+// A "welcome" route for the main URL
+app.get('/', (req, res) => {
+    res.send('Steno Notepad server is running!');
+});
 
 // Route to get the latest notes
 app.get('/api/notes', async (req, res) => {
